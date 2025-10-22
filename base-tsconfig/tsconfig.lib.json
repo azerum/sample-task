@@ -1,0 +1,16 @@
+{
+    // Settings recommended for libraries: 
+    // https://www.typescriptlang.org/docs/handbook/modules/guides/choosing-compiler-options.html#im-writing-a-library
+
+    "extends": "./tsconfig.base.json",
+
+    "compilerOptions": {
+        "module": "node16",
+        "moduleResolution": "node16",
+        "verbatimModuleSyntax": true,
+
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+    }
+}

@@ -1,0 +1,13 @@
+{
+    // Choose the base TSConfig appropriate for the project type
+    // "extends": "@azerum/base-tsconfig/tsconfig.base.json",
+
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist",
+
+        // Override anything as needed
+    },
+
+    "include": ["./src/**/*.ts"]
+}

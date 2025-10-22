@@ -1,0 +1,18 @@
+{
+    // Base settings common for all projects
+
+    "compilerOptions": {
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noImplicitReturns": true,
+
+        "target": "es2022",
+        "lib": ["es2022"],
+
+        // All projects inside Rush.js monorepo benefit from incremental
+        // compilation (see `watch` command we defined)
+        "incremental": true,
+    }
+}

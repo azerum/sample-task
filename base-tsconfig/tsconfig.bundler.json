@@ -1,0 +1,17 @@
+{
+    // Settings recommended for apps whose code is bundled and then executed
+    // in browser:
+    // https://www.typescriptlang.org/docs/handbook/modules/guides/choosing-compiler-options.html#im-using-a-bundler
+
+    "extends": "./tsconfig.base.json",
+
+    "compilerOptions": {
+        "module": "es2022",
+        "moduleResolution": "bundler",
+        "esModuleInterop": true,
+        "verbatimModuleSyntax": true,
+
+        "noEmit": true,
+        "allowArbitraryExtensions": true,
+    }
+}

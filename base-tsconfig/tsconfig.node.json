@@ -1,0 +1,16 @@
+{
+    // Settings recommended for apps running under Node.js: 
+    // https://www.typescriptlang.org/docs/handbook/modules/guides/choosing-compiler-options.html#im-compiling-and-running-the-outputs-in-nodejs
+    //
+    // Note: set { "type": "module" } in package.json. Else running 
+    // `node out/main.js` on compiled project will FAIL!
+
+    "extends": "./tsconfig.base.json",
+
+    "compilerOptions": {
+        "module": "node16",
+        "moduleResolution": "node16",
+        "esModuleInterop": true,
+        "verbatimModuleSyntax": true,
+    }
+}
