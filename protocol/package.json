@@ -13,6 +13,10 @@
     "devDependencies": {
         "@azerum/base-tsconfig": "workspace:*",
         "zod": "4.1.12",
-        "typescript": "5.9.3"
+        "typescript": "5.9.3",
+        "rabbitmq-client": "5.0.5"
+    },
+    "peerDependencies": {
+      "rabbitmq-client": "5.0.5"
     }
 }

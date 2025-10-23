@@ -1,6 +1,7 @@
 {
     "name": "@azerum/PROJECT_NAME",
     "version": "1.0.0",
+    "type": "module",
     
     "scripts": {
         "build": "tsc -p ./tsconfig.build.json",

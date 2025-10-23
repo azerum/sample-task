@@ -1,0 +1,36 @@
+type Query {
+    order(id: ID!): OrderResponse!
+}
+
+type OrderResponse {
+    createdAtMs: Int!
+    productName: String!
+}
+
+type Mutation {
+    createOrder(input: CreateOrderRequest!): ID!
+}
+
+input CreateOrderRequest {
+    # ID for idempotency. Must be unique per client. Clients should use format:
+    #
+    # `${startTimestampMs}.${seq}`
+    #
+    # Where startTimestampMs - timestamp when the client started; seq - 
+    # integer incremented per request sending, starting at 0. 
+    #
+    # Concurrent requests are allowed, but clients must make sure to serialize seq
+    # incrementing logic, so no two distinct requests have the same ID
+    requestId: String!
+
+    productName: String!
+}
+
+type Subscription {
+    orderCreated: OrderCreatedEvent!
+}
+
+type OrderCreatedEvent {
+    orderId: ID!
+    createdAtMs: Float!
+}

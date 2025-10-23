@@ -1,4 +1,15 @@
-import z, {} from 'zod'
+import { z } from 'zod'
+import type { RPCClient } from 'rabbitmq-client'
+
+export async function createOrder(
+    rpcClient: RPCClient, 
+    request: CreateOrderRequest
+): Promise<CreateOrderResponse> {
+    const resMsg = await rpcClient.send(reqOrdersServiceCreateOrder, request)
+    return createOrderResponseZod.parse(resMsg.body)
+}
+
+export const reqOrdersServiceCreateOrder = 'req.orders-service.create-order'
 
 export const createOrderRequestZod = z.object({
     requestId: z.string(),
@@ -20,17 +31,3 @@ export const createOrderResponseZod = z.discriminatedUnion('type', [
 ])
 
 export type CreateOrderResponse = z.infer<typeof createOrderResponseZod>
-
-export const reqOrdersServiceCreateOrder = 'req.orders-service.create-order'
-
-export const orderCreatedEventZod = z.object({
-    orderId: z.string(),
-    createdAtMs: z.number(),
-})
-
-export type OrderCreatedEvent = z.infer<typeof orderCreatedEventZod>
-
-export const eventsOrders = {
-    gateway: 'events.orders.gateway',
-    paymentsService: 'events.orders.payments-service'
-} as const

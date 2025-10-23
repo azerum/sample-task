@@ -1,9 +1,12 @@
 {
     "name": "@azerum/graphql-gateway",
     "version": "1.0.0",
+    "type": "module",
     
     "scripts": {
-        "build": "tsc -p ./tsconfig.build.json",
+        "codegen": "graphql-codegen",
+        "build:self": "tsc -p ./tsconfig.build.json",
+        "build": "rushx codegen && rushx build:self",
         "full-build": "rush build --to @azerum/graphql-gateway",
         "deploy": "rush deploy -p @azerum/graphql-gateway -t ./deploy --overwrite",
         "ship": "rushx full-build && rushx deploy"
@@ -11,6 +14,17 @@
 
     "devDependencies": {
         "@azerum/base-tsconfig": "workspace:*",
-        "typescript": "5.9.3"
+        "typescript": "5.9.3",
+        "@graphql-codegen/add": "6.0.0",
+        "@graphql-codegen/cli": "6.0.1",
+        "@graphql-codegen/typescript": "5.0.2",
+        "@graphql-codegen/typescript-resolvers": "5.1.0",
+        "@types/node": "22.18.0"
+    },
+    "dependencies": {
+      "graphql": "16.11.0",
+      "@apollo/server": "5.0.0",
+      "rabbitmq-client": "5.0.5",
+      "@azerum/protocol": "workspace:*"
     }
 }
