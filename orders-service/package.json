@@ -1,0 +1,25 @@
+{
+    "name": "@azerum/orders-service",
+    "version": "1.0.0",
+    "type": "module",
+    
+    "scripts": {
+        "build": "tsc -p ./tsconfig.build.json",
+        "full-build": "rush build --to @azerum/orders-service",
+        "deploy": "rush deploy -p @azerum/orders-service -t ./deploy --overwrite",
+        "ship": "rushx full-build && rushx deploy"
+    },
+
+    "devDependencies": {
+        "@azerum/base-tsconfig": "workspace:*",
+        "@types/node": "22.18.0",
+        "typescript": "5.9.3"
+    },
+    
+    "dependencies": {
+      "rabbitmq-client": "5.0.5",
+      "mongoose": "8.19.2",
+      "@azerum/protocol": "workspace:*",
+      "zod": "4.1.12"
+    }
+}

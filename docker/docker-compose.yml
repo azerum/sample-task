@@ -1,0 +1,19 @@
+services:
+  rabbit:
+    image: rabbitmq:4.1.4-management
+
+    ports:
+      - 127.0.0.1:5672:5672
+      - 127.0.0.1:15672:15672
+
+  mongo:
+    image: mongo:8.0.15-noble
+
+    volumes:
+      - mongo-volume:/data/db
+
+    ports:
+      - 127.0.0.1:27017:27017
+
+volumes:
+  mongo-volume:

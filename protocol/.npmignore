@@ -1,0 +1,11 @@
+# Specify files that will be in the resulting NPM package. Those files
+# and only those files will be copied by `rush deploy`. 
+# Typically we keep only build output here
+#
+# Note that package.json is always included, regardless of pattern:
+#
+# Note: the syntax is different from .gitignore - `/out/` does not match any
+# files. You have to match the files themselves, not directories - `/out/**/*`
+
+*
+!/out/**/*

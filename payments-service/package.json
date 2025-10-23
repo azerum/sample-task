@@ -1,0 +1,16 @@
+{
+    "name": "@azerum/payments-service",
+    "version": "1.0.0",
+    
+    "scripts": {
+        "build": "tsc -p ./tsconfig.build.json",
+        "full-build": "rush build --to @azerum/payments-service",
+        "deploy": "rush deploy -p @azerum/payments-service -t ./deploy --overwrite",
+        "ship": "rushx full-build && rushx deploy"
+    },
+
+    "devDependencies": {
+        "@azerum/base-tsconfig": "workspace:*",
+        "typescript": "5.9.3"
+    }
+}

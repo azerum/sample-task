@@ -26,7 +26,7 @@
    * Specify one of: "pnpmVersion", "npmVersion", or "yarnVersion".  See the Rush documentation
    * for details about these alternatives.
    */
-  "pnpmVersion": "9.15.9",
+  "pnpmVersion": "8.15.9",
 
   // "npmVersion": "6.14.15",
   // "yarnVersion": "1.9.4",
@@ -444,6 +444,27 @@
     {
       "packageName": "@azerum/base-tsconfig",
       "projectFolder": "base-tsconfig"
+    },
+
+    {
+      "packageName": "@azerum/payments-service",
+      "projectFolder": "payments-service"
+    },
+
+
+    {
+      "packageName": "@azerum/orders-service",
+      "projectFolder": "orders-service"
+    },
+
+    {
+      "packageName": "@azerum/graphql-gateway",
+      "projectFolder": "graphql-gateway"
+    },
+
+    {
+      "packageName": "@azerum/protocol",
+      "projectFolder": "protocol"
     }
   ]
 }

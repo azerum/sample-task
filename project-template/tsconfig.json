@@ -4,9 +4,7 @@
 
     "compilerOptions": {
         "rootDir": "./src",
-        "outDir": "./dist",
-
-        // Override anything as needed
+        "outDir": "./out",
     },
 
     "include": ["./src/**/*.ts"]

@@ -277,9 +277,9 @@
    *
    * PNPM documentation: https://pnpm.io/package_json#pnpmignoredoptionaldependencies
    */
-  "globalIgnoredOptionalDependencies": [
-    // "fsevents"
-  ],
+  // "globalIgnoredOptionalDependencies": [
+  //   // "fsevents"
+  // ],
 
   /**
    * The `globalAllowedDeprecatedVersions` setting suppresses installation warnings for package
