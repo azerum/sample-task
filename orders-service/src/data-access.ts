@@ -1,5 +1,14 @@
-import type { CreateOrderRequest, OrderCreatedEvent } from '@azerum/protocol/out/orders.js'
+import type { CreateOrderRequest, OrderCreatedEvent } from '@azerum/protocol'
 import { OrderModel } from './mongo-schema.js'
+import { connect, disconnect } from 'mongoose'
+
+export async function connectToDb() {
+    await connect('mongodb://127.0.0.1:27017/orders-service')
+}
+
+export async function disconnectFromDb() {
+    await disconnect()
+}
 
 export async function upsertOrder(
     request: CreateOrderRequest
@@ -38,16 +47,24 @@ export async function markOrderCreateEventAsPublished(orderId: string) {
     )
 }
 
-export async function* getUnpublishedCreateEvents(): AsyncIterable<OrderCreatedEvent> {
+export async function* getUnpublishedOrderCreatedEvents(
+    signal?: AbortSignal
+): AsyncIterable<OrderCreatedEvent> {
+    signal?.throwIfAborted()
+
     const docs = OrderModel.find(
         { sentCreatedEvent: false },
         { 
             _id: true,
             createdAtMs: true,
         }
-    ).cursor()
+    ).cursor({
+        lean: true,
+    })
 
     for await (const aDoc of docs) {
+        signal?.throwIfAborted()
+
         yield {
             orderId: aDoc._id.toHexString(),
             createdAtMs: aDoc.createdAtMs,

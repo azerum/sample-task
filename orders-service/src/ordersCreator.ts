@@ -1,12 +1,18 @@
 import { reqOrdersServiceCreateOrder, type CreateOrderResponse, createOrderRequestZod, type OrderCreatedEvent, eventsOrders } from '@azerum/protocol'
-import { upsertOrder, markOrderCreateEventAsPublished, getUnpublishedCreateEvents } from './data-access.js'
+import { upsertOrder, markOrderCreateEventAsPublished } from './data-access.js'
 import { exceptionToMessage } from './exceptionToMessage.js'
-import { rabbit } from './rabbit.js'
+import { once } from 'events'
+import type { Publisher, Connection } from 'rabbitmq-client'
 
-export async function ordersCreator() {
-    void publishRemainingEvents()
+export async function ordersCreator(
+    rabbit: Connection,
+    signal: AbortSignal
+) {
+    const publisher = rabbit.createPublisher({
+        confirm: true,
+    })
 
-    rabbit.createConsumer({
+    const consumer = rabbit.createConsumer({
         queue: reqOrdersServiceCreateOrder,
 
         queueOptions: {
@@ -18,18 +24,21 @@ export async function ordersCreator() {
             prefetchCount: 2,
         },
     }, async (message, reply) => {
-        const response = await handleRequest(message.body)
+        const response = await handleRequest(publisher, message.body)
         await reply(response)
     })
+
+    await once(signal, 'abort')
+    await consumer.close()
+    await publisher.close()
 }
 
-const publisher = rabbit.createPublisher({
-    confirm: true,
-})
-
-async function handleRequest(body: unknown): Promise<CreateOrderResponse> {
+async function handleRequest(
+    publisher: Publisher,
+    body: unknown
+): Promise<CreateOrderResponse> {
     try {
-        const orderId = await handleRequestOrThrow(body)
+        const orderId = await handleRequestOrThrow(publisher, body)
         return { type: 'Ok', orderId }
     }
     catch (exception) {
@@ -43,20 +52,19 @@ async function handleRequest(body: unknown): Promise<CreateOrderResponse> {
 /**
  * @returns Order ID
  */
-async function handleRequestOrThrow(body: unknown): Promise<string> {
+async function handleRequestOrThrow(
+    publisher: Publisher,
+    body: unknown
+): Promise<string> {
     const request = createOrderRequestZod.parse(body)
-    console.log('Parsed', request)
 
     const createdEvent = await upsertOrder(request)
-    console.log('Upserted')
-
-    await publishEvent(createdEvent)
-    console.log('Published')
+    await publishEvent(publisher, createdEvent)
 
     return createdEvent.orderId
 }
 
-async function publishEvent(event: OrderCreatedEvent) {
+export async function publishEvent(publisher: Publisher, event: OrderCreatedEvent) {
     const toGateway = publisher.send(
         {
             routingKey: eventsOrders.gateway,
@@ -79,20 +87,4 @@ async function publishEvent(event: OrderCreatedEvent) {
     await Promise.all([toGateway, toPaymentsService])
 
     await markOrderCreateEventAsPublished(event.orderId)
-}
-
-async function publishRemainingEvents() {
-    const events = getUnpublishedCreateEvents()
-
-    // Tweak concurrency as needed
-    const concurrency = 10
-    const workersPromises = Array(concurrency).fill(0).map(() => worker(events))
-
-    await Promise.all(workersPromises)
-
-    async function worker(events: AsyncIterable<OrderCreatedEvent>) {
-        for await (const e of events) {
-            await publishEvent(e)
-        }
-    }
 }
