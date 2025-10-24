@@ -3,16 +3,13 @@ import { getUnpublishedOrderCreatedEvents } from './data-access.js'
 import { publishEvent } from './ordersCreator.js'
 import { makeOrdersEventPublisher } from './rabbit.js'
 import type { Connection, Publisher } from 'rabbitmq-client'
-import { deferAsync } from './utils/deferAsync.js'
 import { catchAbortError } from './utils/exitOnAbortError.js'
 
 export async function publishUnpublishedEvents(
     rabbit: Connection,
     signal?: AbortSignal
 ) {
-    const publisher = makeOrdersEventPublisher(rabbit)
-    await using _ = deferAsync(() => publisher.close())
-    
+    await using publisher = makeOrdersEventPublisher(rabbit)
     const events = getUnpublishedOrderCreatedEvents(signal)
 
     // Tweak concurrency as needed

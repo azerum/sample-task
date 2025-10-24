@@ -3,14 +3,13 @@ import { upsertOrder, markOrderCreateEventAsPublished } from './data-access.js'
 import { exceptionToMessage } from './exceptionToMessage.js'
 import { once } from 'events'
 import type { Publisher, Connection } from 'rabbitmq-client'
+import { makeOrdersEventPublisher } from './rabbit.js'
 
 export async function ordersCreator(
     rabbit: Connection,
     signal: AbortSignal
 ) {
-    const publisher = rabbit.createPublisher({
-        confirm: true,
-    })
+    await using publisher = makeOrdersEventPublisher(rabbit)
 
     const consumer = rabbit.createConsumer({
         queue: reqOrdersServiceCreateOrder,
@@ -30,7 +29,6 @@ export async function ordersCreator(
 
     await once(signal, 'abort')
     await consumer.close()
-    await publisher.close()
 }
 
 async function handleRequest(
@@ -57,9 +55,13 @@ async function handleRequestOrThrow(
     body: unknown
 ): Promise<string> {
     const request = createOrderRequestZod.parse(body)
+    console.log('Parsed', request)
 
     const createdEvent = await upsertOrder(request)
+    console.log('Upserted', createdEvent)
+
     await publishEvent(publisher, createdEvent)
+    console.log('Published')
 
     return createdEvent.orderId
 }

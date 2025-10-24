@@ -7,13 +7,21 @@
         "build": "tsc -p ./tsconfig.build.json",
         "full-build": "rush build --to @azerum/orders-service",
         "deploy": "rush deploy -p @azerum/orders-service -t ./deploy --overwrite",
-        "ship": "rushx full-build && rushx deploy"
+        "ship": "rushx full-build && rushx deploy",
+        "test:dev": "vitest",
+        "test": "vitest run"
     },
 
     "devDependencies": {
         "@azerum/base-tsconfig": "workspace:*",
         "@types/node": "22.18.0",
-        "typescript": "5.9.3"
+        "typescript": "5.9.3",
+        "tsx": "4.20.6",
+        "vitest": "4.0.2",
+        "testcontainers": "11.7.2",
+        "execa": "9.6.0",
+        "ts-dotenv": "0.9.1",
+        "@whatwg-node/disposablestack": "0.0.6"
     },
     
     "dependencies": {

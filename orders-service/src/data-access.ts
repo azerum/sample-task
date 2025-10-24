@@ -1,14 +1,5 @@
 import type { CreateOrderRequest, OrderCreatedEvent } from '@azerum/protocol'
 import { OrderModel } from './mongo-schema.js'
-import { connect, disconnect } from 'mongoose'
-
-export async function connectToDb() {
-    await connect('mongodb://127.0.0.1:27017/orders-service')
-}
-
-export async function disconnectFromDb() {
-    await disconnect()
-}
 
 export async function upsertOrder(
     request: CreateOrderRequest

@@ -1,13 +1,19 @@
 import { Connection } from 'rabbitmq-client'
 
-export function makeRabbit() {
-    return new Connection({
-        url: 'amqp://guest:guest@127.0.0.1:5672'
+export function makeRabbit(url: string,) {
+    const connection = new Connection({ url })
+
+    return Object.assign(connection, {
+        [Symbol.asyncDispose]: () => connection.close()
     })
 }
 
 export function makeOrdersEventPublisher(rabbit: Connection) {
-    return rabbit.createPublisher({ 
+    const publisher = rabbit.createPublisher({ 
         confirm: true,
+    })
+
+    return Object.assign(publisher, {
+        [Symbol.asyncDispose]: () => publisher.close()
     })
 }
