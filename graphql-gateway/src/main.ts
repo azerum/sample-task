@@ -39,8 +39,8 @@ const resolvers: Resolvers<Context> = {
                 }
             }
         }
-    }
-}
+    },
+} 
 
 const server = new ApolloServer({
     typeDefs,
@@ -53,5 +53,5 @@ startStandaloneServer<Context>(server, {
         port: 8080
     },
 
-    context: async () => ({ userId: 'Bob' }),
+    context: async () => ({ userId: 'bob' }),
 })

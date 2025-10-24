@@ -83,5 +83,10 @@ Orders web app likely either knows order info already or can fetch it
 # Outbox table
 
 Instead of outbox table for orders, I used Order.sentCreatedEvent and partial index
-when it is false. This avoids manual logic of adding/deleting entries - just
-lookup orders by sentCreatedEvent: false and set it to `true` when published
+when it is false. This keeps a small index for just orders with unpublished events
+
+This avoids manual logic of adding/deleting entries - just lookup orders by 
+`sentCreatedEvent: false` and set it to `true` when published
+
+This also gives atomic "add order" and "add outbox table entry" (where outbox
+table entry is really just a `sentCreatedEvent: false`)
