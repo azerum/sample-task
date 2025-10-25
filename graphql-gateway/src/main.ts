@@ -1,57 +1,64 @@
-import type { Resolvers } from './graphql.generated.js'
 import { ApolloServer } from '@apollo/server'
-import { startStandaloneServer } from '@apollo/server/standalone'
 import { readFileSync } from 'fs'
 import path from 'path'
-import { rpcClient } from './rabbit.js'
-import { createOrder } from '@azerum/protocol'
+import { expressMiddleware } from '@as-integrations/express5'
+import express from 'express'
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { createServer } from 'http'
+import { WebSocketServer } from 'ws'
+import { useServer } from 'graphql-ws/use/ws'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { makeResolvers } from './makeResolvers.js'
+import { subscribeToOrderCreated } from './subscribeToOrderCreated.js'
+import { type GatewayPubSub } from './GatewayPubSub.js'
+import { rabbit } from './rabbit.js'
+import { PubSub } from 'graphql-subscriptions'
 
 const typeDefs = readFileSync(
     path.resolve(import.meta.dirname, '../schema.graphql'),
     'utf-8'
 )
 
-interface Context {
-    userId: string
-}
+const pubSub: GatewayPubSub = new PubSub()
 
-const resolvers: Resolvers<Context> = {
-    Query: {
-        order: async (_source, _args) => {
-            throw new Error('Not implemented')
-        }
-    },
+subscribeToOrderCreated(rabbit, pubSub)
+const resolvers = makeResolvers(rabbit, pubSub)
 
-    Mutation: {
-        createOrder: async (_source, args, context) => {
-            const response = await createOrder(rpcClient, {
-                requestId: `${context.userId}.${args.input.requestId}`,
-                productName: args.input.productName,
-            })
+const schema = makeExecutableSchema({ typeDefs, resolvers })
 
-            switch (response.type) {
-                case 'Ok': {
-                    return response.orderId
-                }
+const app = express()
+const httpServer = createServer(app)
 
-                case 'Error': {
-                    throw new Error(response.message)
-                }
-            }
-        }
-    },
-} 
+const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/subscriptions',
+})
+
+const serverCleanup = useServer({ schema }, wsServer)
 
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
     introspection: true,
+
+    plugins: [
+        ApolloServerPluginDrainHttpServer({ httpServer }),
+
+        {
+            async serverWillStart() {
+                return {
+                    async drainServer() {
+                        await serverCleanup.dispose()
+                    },
+                }
+            },
+        }
+    ]
 })
 
-startStandaloneServer<Context>(server, {
-    listen: {
-        port: 8080
-    },
+await server.start()
 
-    context: async () => ({ userId: 'bob' }),
-})
+app.use('/graphql', express.json(), expressMiddleware(server, {
+    context: async () => ({ userId: 'Bob' })
+}))
+
+httpServer.listen(8080)

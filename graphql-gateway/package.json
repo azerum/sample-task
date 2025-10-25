@@ -19,12 +19,20 @@
         "@graphql-codegen/cli": "6.0.1",
         "@graphql-codegen/typescript": "5.0.2",
         "@graphql-codegen/typescript-resolvers": "5.1.0",
-        "@types/node": "22.18.0"
+        "@types/node": "22.18.0",
+        "@types/express": "5.0.4",
+        "@types/ws": "8.18.1"
     },
     "dependencies": {
       "graphql": "16.11.0",
       "@apollo/server": "5.0.0",
       "rabbitmq-client": "5.0.5",
-      "@azerum/protocol": "workspace:*"
+      "@azerum/protocol": "workspace:*",
+      "graphql-ws": "6.0.6",
+      "@as-integrations/express5": "1.1.2",
+      "express": "5.1.0",
+      "ws": "8.18.3",
+      "@graphql-tools/schema": "10.0.25",
+      "graphql-subscriptions": "3.0.0"
     }
 }

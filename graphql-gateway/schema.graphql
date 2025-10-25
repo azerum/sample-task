@@ -27,10 +27,10 @@ input CreateOrderRequest {
 }
 
 type Subscription {
-    orderCreated: OrderCreatedEvent!
+    orderCreated: OrderCreatedResponse!
 }
 
-type OrderCreatedEvent {
+type OrderCreatedResponse {
     orderId: ID!
     createdAtMs: Float!
 }
