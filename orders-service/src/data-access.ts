@@ -1,12 +1,16 @@
 import type { CreateOrderRequest, OrderCreatedEvent } from '@azerum/protocol'
 import { OrderModel } from './mongo-schema.js'
 
+export type UpsertOrderResult = 
+    | { type: 'AlreadyExists', id: string }
+    | { type: 'Created', event: OrderCreatedEvent }
+
 export async function upsertOrder(
     request: CreateOrderRequest
-): Promise<OrderCreatedEvent> {
+): Promise<UpsertOrderResult> {
     const createdAtMs = Date.now()
 
-    const order = await OrderModel.findOneAndUpdate(
+    const result = await OrderModel.findOneAndUpdate(
         { createRequestId: request.requestId },
 
         {
@@ -22,12 +26,28 @@ export async function upsertOrder(
             upsert: true,
             returnDocument: 'after',
             projection: { _id: true },
+            includeResultMetadata: true,
         },
     )
 
+    if (result.value === null) {
+        throw new Error(`Should not happen: findOneAndUpdate returned null. requestId: ${request.requestId}`)
+    }
+
+    if (result.lastErrorObject?.updatedExisting === true) {
+        return { 
+            type: 'AlreadyExists', 
+            id: result.value._id.toHexString() 
+        }
+    }
+
     return {
-        orderId: order._id.toHexString(),
-        createdAtMs,
+        type: 'Created',
+
+        event: {
+            orderId: result.value._id.toHexString(),
+            createdAtMs,
+        }
     }
 }
 

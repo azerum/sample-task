@@ -55,15 +55,18 @@ async function handleRequestOrThrow(
     body: unknown
 ): Promise<string> {
     const request = createOrderRequestZod.parse(body)
-    console.log('Parsed', request)
+    const upsertResult = await upsertOrder(request)
 
-    const createdEvent = await upsertOrder(request)
-    console.log('Upserted', createdEvent)
+    switch (upsertResult.type) {
+        case 'AlreadyExists': {
+            return upsertResult.id
+        }
 
-    await publishEvent(publisher, createdEvent)
-    console.log('Published')
-
-    return createdEvent.orderId
+        case 'Created': {
+            await publishEvent(publisher, upsertResult.event)
+            return upsertResult.event.orderId
+        }
+    }
 }
 
 export async function publishEvent(publisher: Publisher, event: OrderCreatedEvent) {
