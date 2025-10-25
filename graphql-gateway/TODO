@@ -1,0 +1,6 @@
+[] __typename in code is ugly as it slows refactoring. Maybe remove it?
+
+[] @graphql-codegen/typescript has weird type for SubscriptionObject. It makes
+confusing errors when returning object of wrong shape
+
+[] Map of PubSub is ugly (two levels of nesting, event: { event: <event> })
